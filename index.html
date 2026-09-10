@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fetchora — Download any file or video from a link</title>
+  <meta name="description" content="Paste a URL and get a download link. Fetchora streams files, videos, PDFs, and archives to your device. No install required.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e7490'/%3E%3Cpath d='M16 8v12m0 0l-4.5-4.5M16 20l4.5-4.5M8 24h16' stroke='%23fff' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32"><rect width="32" height="32" rx="8" fill="#0e7490"/><path d="M16 8v12m0 0l-4.5-4.5M16 20l4.5-4.5M8 24h16" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand-name">Fetchora</span>
+      </a>
+      <nav class="nav-desktop" aria-label="Primary">
+        <a href="#download">Downloader</a>
+        <a href="#platforms">Platforms</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn-primary btn-sm" href="#download">New download</a>
+      </nav>
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <nav class="nav-mobile" id="mobileNav" hidden>
+      <a href="#download">Downloader</a>
+      <a href="#platforms">Platforms</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="download">
+      <div class="grid-bg" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div class="brand-hero-icon">
+          <svg viewBox="0 0 32 32" width="72" height="72"><rect width="32" height="32" rx="8" fill="#0e7490"/><path d="M16 8v12m0 0l-4.5-4.5M16 20l4.5-4.5M8 24h16" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="pill">
+          <span class="pill-badge">V1</span>
+          Supports direct file links and video URLs from 12+ platforms
+        </div>
+        <h1>Download files and videos from any link</h1>
+        <p class="hero-lead">Paste a URL. Fetchora prepares a clean download link — videos, PDFs, archives, installers, and more. Nothing to install.</p>
+        <ul class="hero-points">
+          <li>
+            <span class="point-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </span>
+            <span><strong>Direct links</strong> — files stream to your device</span>
+          </li>
+          <li>
+            <span class="point-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </span>
+            <span><strong>Fast prepare</strong> — quality options in seconds</span>
+          </li>
+          <li>
+            <span class="point-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <span><strong>Private</strong> — we do not store your files</span>
+          </li>
+          <li>
+            <span class="point-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </span>
+            <span><strong>Any file</strong> — ZIP, PDF, MP4, MP3, ISO</span>
+          </li>
+        </ul>
+
+        <form class="download-form" id="downloadForm" autocomplete="off">
+          <label class="sr-only" for="urlInput">File or video URL</label>
+          <div class="form-row">
+            <input id="urlInput" name="url" type="url" inputmode="url" required placeholder="Paste a file or video URL here" autofocus>
+            <button class="btn btn-primary btn-lg" type="submit" id="submitBtn">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 13v8l-4-4"/><path d="m12 21 4-4"/><path d="M4.4 15.3A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.4 8.3"/></svg>
+              <span>Download</span>
+            </button>
+          </div>
+          <p class="form-note">By using Fetchora you agree to the <a href="#terms">Terms of Use</a>.</p>
+        </form>
+
+        <div class="trust-row">
+          <span class="trust-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            Scanned for safety
+          </span>
+          <span><strong>0</strong> signup required</span>
+          <span><strong>12+</strong> platforms</span>
+          <span><strong>SD–4K</strong> quality picks</span>
+        </div>
+
+        <div class="status-card" id="statusCard" hidden>
+          <div class="status-spinner"></div>
+          <p>Preparing your download link. Stay on this page.</p>
+          <div class="progress"><span id="progressBar"></span></div>
+        </div>
+
+        <div class="result-card" id="resultCard" hidden></div>
+        <p class="form-error" id="formError" hidden></p>
+      </div>
+      <div class="seen-on">
+        <span>Works with</span>
+        <div class="seen-logos">
+          <span>YouTube</span>
+          <span>Instagram</span>
+          <span>TikTok</span>
+          <span>Facebook</span>
+          <span>X / Twitter</span>
+          <span>Vimeo</span>
+          <span>Direct files</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section platforms" id="platforms">
+      <div class="section-inner">
+        <div class="section-head">
+          <div class="accent-line"></div>
+          <h2>Supported sources</h2>
+          <p>Paste a link from a popular video site or a direct file URL. Fetchora detects the source and lists download options.</p>
+        </div>
+        <ul class="platform-grid">
+          <li><a href="#download" data-sample="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><span class="plat-dot yt"></span>youtube.com</a></li>
+          <li><a href="#download" data-sample="https://www.instagram.com/p/example/"><span class="plat-dot ig"></span>instagram.com</a></li>
+          <li><a href="#download" data-sample="https://www.tiktok.com/@user/video/1"><span class="plat-dot tt"></span>tiktok.com</a></li>
+          <li><a href="#download" data-sample="https://www.facebook.com/watch/?v=1"><span class="plat-dot fb"></span>facebook.com</a></li>
+          <li><a href="#download" data-sample="https://x.com/user/status/1"><span class="plat-dot x"></span>x.com</a></li>
+          <li><a href="#download" data-sample="https://vimeo.com/123456"><span class="plat-dot vm"></span>vimeo.com</a></li>
+          <li><a href="#download" data-sample="https://www.dailymotion.com/video/x"><span class="plat-dot dm"></span>dailymotion.com</a></li>
+          <li><a href="#download" data-sample="https://soundcloud.com/artist/track"><span class="plat-dot sc"></span>soundcloud.com</a></li>
+          <li><a href="#download" data-sample="https://www.reddit.com/r/videos/"><span class="plat-dot rd"></span>reddit.com</a></li>
+          <li><a href="#download" data-sample="https://www.threads.net/@user"><span class="plat-dot th"></span>threads.net</a></li>
+          <li><a href="#download" data-sample="https://www.dropbox.com/s/file.zip"><span class="plat-dot db"></span>dropbox.com</a></li>
+          <li><a href="#download" data-sample="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"><span class="plat-dot fl"></span>direct MP4</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section features" id="features">
+      <div class="section-inner">
+        <div class="section-head">
+          <div class="accent-line"></div>
+          <h2>Skip the extra apps</h2>
+          <p>One paste box for files and videos. Fetchora builds a download link you can save on desktop or phone.</p>
+        </div>
+        <div class="card-grid">
+          <article class="feature-card accent-cyan">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            </div>
+            <h3>No install required</h3>
+            <p>Everything runs in the browser. Paste a URL, pick a format, and save. Works on Chrome, Firefox, Safari, and Edge.</p>
+          </article>
+          <article class="feature-card accent-emerald">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+            </div>
+            <h3>Quality from SD to 4K</h3>
+            <p>Video links show MP4 and audio options when the source allows it. Direct files keep the original name and type.</p>
+          </article>
+          <article class="feature-card accent-amber">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3>Private by default</h3>
+            <p>Links are processed in your session. Fetchora does not keep a public copy of your files or share them with anyone else.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section types">
+      <div class="section-inner">
+        <div class="section-head">
+          <div class="accent-line"></div>
+          <h2>What you can download</h2>
+          <p>Point Fetchora at a direct file URL or a supported media page. Filename and type stay intact whenever the source serves them.</p>
+        </div>
+        <div class="card-grid">
+          <article class="feature-card muted">
+            <div class="card-icon muted-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="16" r="2"/></svg>
+            </div>
+            <h3>Archives and datasets</h3>
+            <p>ZIP, 7z, tar.gz, and other archives. You get the raw file back, exactly as the origin served it.</p>
+          </article>
+          <article class="feature-card muted">
+            <div class="card-icon muted-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 13v8l-4-4"/><path d="m12 21 4-4"/><path d="M4.4 15.3A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.4 8.3"/></svg>
+            </div>
+            <h3>Documents and media</h3>
+            <p>PDFs, ISOs, installers, videos, and audio. MIME type is preserved so your browser handles the file correctly.</p>
+          </article>
+          <article class="feature-card muted">
+            <div class="card-icon muted-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <h3>Any type, any size</h3>
+            <p>No format whitelist. If it has a reachable download URL, Fetchora can surface a save link for it.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section how" id="how">
+      <div class="section-inner">
+        <div class="section-head">
+          <span class="mini-pill">How it works</span>
+          <h2>From a link to a save button in three steps</h2>
+          <p>Paste a URL. Fetchora detects the source, lists formats, and hands you a download link.</p>
+        </div>
+        <div class="steps">
+          <article class="step-card">
+            <div class="step-preview p1">
+              <div class="mini-ui">
+                <div class="mini-input">https://example.com/file.pdf</div>
+                <div class="mini-btn">Download</div>
+              </div>
+            </div>
+            <div class="step-label"><span>1</span><h3>Paste a link</h3></div>
+            <p>Drop in a video page or a direct file URL — ZIP, PDF, MP4, or dataset. Nothing to configure.</p>
+          </article>
+          <article class="step-card">
+            <div class="step-preview p2">
+              <div class="mini-ui">
+                <div class="mini-bars">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="mini-grid">
+                  <i></i><i></i><i></i>
+                </div>
+              </div>
+            </div>
+            <div class="step-label"><span class="s2">2</span><h3>We prepare options</h3></div>
+            <p>The link is inspected for platform, filename, and available formats. Quality chips appear when the source supports them.</p>
+          </article>
+          <article class="step-card">
+            <div class="step-preview p3">
+              <div class="mini-ui">
+                <div class="mini-file">report.pdf</div>
+                <div class="mini-file dim">archive.zip</div>
+                <div class="mini-save">Save file</div>
+              </div>
+            </div>
+            <div class="step-label"><span class="s3">3</span><h3>Save to your device</h3></div>
+            <p>Pick a format and download. Original filename is kept whenever the source provides one.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq" id="faq">
+      <div class="section-inner narrow">
+        <div class="section-head">
+          <div class="accent-line"></div>
+          <h2>Frequently asked questions</h2>
+        </div>
+        <div class="faq-list">
+          <article class="faq-item">
+            <button class="faq-q" type="button">How do I download a file or video from a URL?</button>
+            <div class="faq-a">
+              <p>Copy the link from the source site, paste it into the box on this page, and press Download. Fetchora lists available formats. Choose one and save it to your computer or phone.</p>
+            </div>
+          </article>
+          <article class="faq-item">
+            <button class="faq-q" type="button">Which sites are supported?</button>
+            <div class="faq-a">
+              <p>YouTube, Instagram, TikTok, Facebook, X, Vimeo, Dailymotion, SoundCloud, Reddit, Threads, cloud storage links, and any direct file URL (PDF, ZIP, MP4, and similar).</p>
+            </div>
+          </article>
+          <article class="faq-item">
+            <button class="faq-q" type="button">Do I need to install an app?</button>
+            <div class="faq-a">
+              <p>No. Fetchora runs in the browser on desktop and mobile. There is no extension required for the paste-and-download flow.</p>
+            </div>
+          </article>
+          <article class="faq-item">
+            <button class="faq-q" type="button">Is it free to use?</button>
+            <div class="faq-a">
+              <p>The downloader on this page is free. Use only content you have the right to save. Respect the terms of each source platform and local copyright law.</p>
+            </div>
+          </article>
+          <article class="faq-item">
+            <button class="faq-q" type="button">Why did a download fail?</button>
+            <div class="faq-a">
+              <p>Some hosts block hotlinking or require a login. Direct public files usually work. Protected, private, or DRM-restricted media cannot be saved here. Try another public URL or download from the original site if they offer a button.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta" id="cta">
+      <div class="section-inner narrow">
+        <h2>Ready to grab a file?</h2>
+        <p>Paste a public file or video URL and get a download link.</p>
+        <form class="download-form compact" id="ctaForm">
+          <div class="form-row">
+            <input type="url" name="url" required placeholder="Enter a file URL (e.g. https://example.com/file.pdf)">
+            <button class="btn btn-primary btn-lg" type="submit">Download</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="terms">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="#top">
+          <span class="brand-mark">
+            <svg viewBox="0 0 32 32" width="32" height="32"><rect width="32" height="32" rx="8" fill="#0e7490"/><path d="M16 8v12m0 0l-4.5-4.5M16 20l4.5-4.5M8 24h16" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="brand-name">Fetchora</span>
+        </a>
+        <p>Cloud capture for file links and video URLs.</p>
+        <p class="copy">© 2026 Fetchora</p>
+      </div>
+      <nav>
+        <h4>Products</h4>
+        <a href="#download">File downloader</a>
+        <a href="#download">Video downloader</a>
+        <a href="#platforms">Supported sites</a>
+      </nav>
+      <nav>
+        <h4>Resources</h4>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <a href="#features">Features</a>
+      </nav>
+      <nav>
+        <h4>Legal</h4>
+        <a href="#terms">Terms of use</a>
+        <p class="legal-note">Use Fetchora only for files and media you are allowed to download. Do not use it to bypass paywalls, DRM, or private accounts.</p>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
