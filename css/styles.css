@@ -141,7 +141,7 @@ p { margin: 0 0 1em; color: var(--muted); }
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 48px 24px 32px;
+  padding: 28px 24px 32px;
   text-align: center;
 }
 .grid-bg {
@@ -192,8 +192,9 @@ p { margin: 0 0 1em; color: var(--muted); }
 .hero h1 {
   font-size: clamp(32px, 6vw, 56px);
   font-weight: 800;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
+
 .hero-lead {
   font-size: 18px;
   max-width: 640px;
@@ -228,7 +229,7 @@ p { margin: 0 0 1em; color: var(--muted); }
   margin-top: 1px;
 }
 
-.download-form { width: 100%; }
+.download-form { width: 100%; margin-bottom: 8px; }
 .form-row {
   display: flex;
   flex-direction: column;
@@ -708,5 +709,5 @@ p { margin: 0 0 1em; color: var(--muted); }
   .card-grid, .steps { grid-template-columns: repeat(3, 1fr); }
   .platform-grid { grid-template-columns: repeat(4, 1fr); }
   .footer-inner { grid-template-columns: 1.4fr 1fr 1fr 1.2fr; }
-  .hero { padding-top: 64px; }
+  .hero { padding-top: 36px; }
 }
