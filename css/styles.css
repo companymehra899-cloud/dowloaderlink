@@ -46,34 +46,45 @@ p { margin: 0 0 1em; color: var(--muted); }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
-  box-shadow: 0 14px 34px rgba(8, 47, 73, 0.06);
 }
 .header-inner {
   max-width: var(--max);
   margin: 0 auto;
+  min-height: var(--header);
   height: var(--header);
-  padding: 0 24px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
 }
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: var(--ink);
   font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1;
 }
+.brand-mark {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.brand-mark svg { width: 32px; height: 32px; }
 .brand:hover { color: var(--ink); opacity: 0.9; }
-.brand-name { font-size: 15px; }
+.brand-name { font-size: 16px; letter-spacing: -0.02em; }
 .nav-desktop {
   display: none;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 .nav-desktop a {
   color: #334155;
@@ -81,8 +92,15 @@ p { margin: 0 0 1em; color: var(--muted); }
   font-weight: 500;
   padding: 8px 12px;
   border-radius: 8px;
+  white-space: nowrap;
+  line-height: 1;
 }
 .nav-desktop a:hover { background: #f1f5f9; color: var(--ink); }
+.nav-desktop .btn-sm {
+  margin-left: 8px;
+  height: 36px;
+  padding: 0 14px;
+}
 .menu-btn {
   width: 40px;
   height: 40px;
@@ -91,8 +109,12 @@ p { margin: 0 0 1em; color: var(--muted); }
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   gap: 5px;
   cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0;
 }
 .menu-btn span {
   display: block;
@@ -141,7 +163,7 @@ p { margin: 0 0 1em; color: var(--muted); }
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 48px 24px 32px;
+  padding: 20px 24px 28px;
   text-align: center;
 }
 .grid-bg {
@@ -159,14 +181,6 @@ p { margin: 0 0 1em; color: var(--muted); }
   max-width: 760px;
   margin: 0 auto;
 }
-.brand-hero-icon {
-  width: 88px;
-  height: 88px;
-  margin: 0 auto 16px;
-  display: grid;
-  place-items: center;
-  filter: drop-shadow(0 18px 30px rgba(14, 116, 144, 0.28));
-}
 .pill {
   display: inline-flex;
   align-items: center;
@@ -178,7 +192,7 @@ p { margin: 0 0 1em; color: var(--muted); }
   font-size: 12px;
   font-weight: 600;
   color: #475569;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 .pill-badge {
   background: #d1fae5;
@@ -190,19 +204,23 @@ p { margin: 0 0 1em; color: var(--muted); }
   border-radius: 999px;
 }
 .hero h1 {
-  font-size: clamp(32px, 6vw, 56px);
+  font-size: clamp(28px, 5vw, 44px);
   font-weight: 800;
-  margin-bottom: 12px;
+  margin: 8px 0 8px;
 }
 .hero-lead {
-  font-size: 18px;
+  font-size: 16px;
   max-width: 640px;
-  margin: 0 auto 24px;
+  margin: 0 auto 0;
+}
+.download-form {
+  width: 100%;
+  margin: 0 0 20px;
 }
 .hero-points {
   list-style: none;
   padding: 0;
-  margin: 0 auto 24px;
+  margin: 28px auto 0;
   max-width: 560px;
   display: grid;
   gap: 10px 20px;
@@ -228,7 +246,6 @@ p { margin: 0 0 1em; color: var(--muted); }
   margin-top: 1px;
 }
 
-.download-form { width: 100%; }
 .form-row {
   display: flex;
   flex-direction: column;
@@ -708,5 +725,5 @@ p { margin: 0 0 1em; color: var(--muted); }
   .card-grid, .steps { grid-template-columns: repeat(3, 1fr); }
   .platform-grid { grid-template-columns: repeat(4, 1fr); }
   .footer-inner { grid-template-columns: 1.4fr 1fr 1fr 1.2fr; }
-  .hero { padding-top: 64px; }
+  .hero { padding-top: 28px; }
 }
