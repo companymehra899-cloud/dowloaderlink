@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=3">
+  <link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body>
   <header class="site-header" id="top">
@@ -47,24 +47,26 @@
           Supports direct file links and video URLs from 12+ platforms
         </div>
 
-        <form class="download-form" id="downloadForm" autocomplete="off">
-          <label class="sr-only" for="urlInput">File or video URL</label>
-          <div class="form-row">
-            <input id="urlInput" name="url" type="url" inputmode="url" required placeholder="Paste a file or video URL here" autofocus>
-            <button class="btn btn-primary btn-lg" type="submit" id="submitBtn">Download</button>
+        <div class="hero-search">
+          <form class="download-form" id="downloadForm" autocomplete="off">
+            <label class="sr-only" for="urlInput">File or video URL</label>
+            <div class="form-row">
+              <input id="urlInput" name="url" type="url" inputmode="url" required placeholder="Paste a file or video URL here" autofocus>
+              <button class="btn btn-primary btn-lg" type="submit" id="submitBtn">Download</button>
+            </div>
+            <p class="form-note">By using Fetchora you agree to the <a href="#terms">Terms of Use</a>.</p>
+          </form>
+
+          <div class="status-card" id="statusCard" hidden>
+            <div class="status-spinner"></div>
+            <p>Preparing your download link. Stay on this page.</p>
+            <div class="progress"><span id="progressBar"></span></div>
           </div>
-          <p class="form-note">By using Fetchora you agree to the <a href="#terms">Terms of Use</a>.</p>
-        </form>
+          <div class="result-card" id="resultCard" hidden></div>
+          <p class="form-error" id="formError" hidden></p>
 
-        <div class="status-card" id="statusCard" hidden>
-          <div class="status-spinner"></div>
-          <p>Preparing your download link. Stay on this page.</p>
-          <div class="progress"><span id="progressBar"></span></div>
+          <h1 class="hero-title">Download files and videos from any link</h1>
         </div>
-        <div class="result-card" id="resultCard" hidden></div>
-        <p class="form-error" id="formError" hidden></p>
-
-        <h1 class="hero-title">Download files and videos from any link</h1>
         <p class="hero-lead">Paste a URL. Fetchora prepares a clean download link — videos, PDFs, archives, installers, and more. Nothing to install.</p>
 
         <div class="trust-row">
