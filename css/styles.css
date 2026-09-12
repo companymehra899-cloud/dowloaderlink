@@ -185,7 +185,7 @@ p { margin: 0 0 1em; color: var(--muted); }
 }
 .hero-inner {
   position: relative;
-  max-width: 760px;
+  max-width: var(--max);
   margin: 0 auto;
 }
 .pill {
@@ -214,10 +214,11 @@ p { margin: 0 0 1em; color: var(--muted); }
   border-radius: 999px;
 }
 .hero h1 {
-  font-size: clamp(24px, 7vw, 44px);
+  font-size: clamp(13px, 3.6vw, 36px);
   font-weight: 800;
   margin: 8px 0 8px;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  letter-spacing: -0.04em;
 }
 .hero-lead {
   font-size: 15px;
