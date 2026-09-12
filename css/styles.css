@@ -924,3 +924,104 @@ p { margin: 0 0 1em; color: var(--muted); }
   .footer-inner { grid-template-columns: 1.4fr 1fr 1fr 1.2fr; }
   .hero { padding-top: 28px; }
 }
+
+/* === Colorful text palette (color only, no layout changes) === */
+.brand-name {
+  color: #0e7490;
+}
+.brand-tag {
+  color: #7c3aed;
+}
+
+.nav-desktop a {
+  color: #155e75;
+}
+.nav-desktop a:hover { color: #be185d; }
+.nav-mobile a { color: #155e75; }
+.nav-mobile a:hover { color: #be185d; }
+
+.hero-title {
+  background-image: linear-gradient(92deg, #0e7490 0%, #7c3aed 48%, #db2777 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #0e7490;
+}
+.hero-lead {
+  color: #475569;
+}
+.form-note { color: #8b5cf6; }
+.form-note a { color: #db2777; font-weight: 600; }
+
+.trust-item { color: #155e75; }
+.trust-item strong { color: #db2777; }
+
+.hero-points li { color: #475569; }
+.hero-points strong { color: #6d28d9; }
+.point-icon { color: #059669; }
+
+.platforms .section-head h2 {
+  background-image: linear-gradient(92deg, #0284c7, #6d28d9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.platform-grid a { color: #1d4ed8; }
+.platform-grid a:hover { color: #db2777; }
+
+.features .section-head h2 {
+  background-image: linear-gradient(92deg, #059669, #0e7490);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.feature-card h3 { color: #155e75; }
+.accent-cyan h3 { color: #0e7490; }
+.accent-emerald h3 { color: #059669; }
+.accent-amber h3 { color: #d97706; }
+.feature-card.muted h3 { color: #7c3aed; }
+
+.types .section-head h2 {
+  background-image: linear-gradient(92deg, #d97706, #db2777);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.how .section-head h2 {
+  background-image: linear-gradient(92deg, #7c3aed, #0e7490);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.step-label h3 { color: #155e75; }
+.step-card:nth-child(1) .step-label h3 { color: #0e7490; }
+.step-card:nth-child(2) .step-label h3 { color: #7c3aed; }
+.step-card:nth-child(3) .step-label h3 { color: #059669; }
+
+.faq .section-head h2 {
+  background-image: linear-gradient(92deg, #db2777, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.faq-q { color: #155e75; }
+.faq-item.open .faq-q { color: #be185d; }
+
+.cta h2 {
+  background-image: linear-gradient(92deg, #0e7490, #7c3aed, #db2777);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cta p { color: #475569; }
+
+.section-head p { color: #475569; }
+.seen-on > span { color: #7c3aed; }
+.seen-logos { color: #155e75; }
+
+.site-footer h4 { color: #22d3ee; }
+.site-footer nav a { color: #c4b5fd; }
+.site-footer nav a:hover { color: #f9a8d4; }
+.site-footer .brand-name { color: #22d3ee; }
+.site-footer .legal-note { color: #a5b4fc; }
