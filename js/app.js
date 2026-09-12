@@ -11,20 +11,31 @@
   const progressBar = document.getElementById("progressBar");
 
   if (menuBtn && mobileNav) {
+    function closeMenu() {
+      mobileNav.setAttribute("hidden", "");
+      mobileNav.classList.remove("is-open");
+      menuBtn.setAttribute("aria-expanded", "false");
+      menuBtn.setAttribute("aria-label", "Open menu");
+    }
+
+    function openMenu() {
+      mobileNav.removeAttribute("hidden");
+      mobileNav.classList.add("is-open");
+      menuBtn.setAttribute("aria-expanded", "true");
+      menuBtn.setAttribute("aria-label", "Close menu");
+    }
+
+    closeMenu();
+
     menuBtn.addEventListener("click", function () {
-      const open = mobileNav.hasAttribute("hidden") === false;
-      if (open) {
-        mobileNav.setAttribute("hidden", "");
-        menuBtn.setAttribute("aria-expanded", "false");
-      } else {
-        mobileNav.removeAttribute("hidden");
-        menuBtn.setAttribute("aria-expanded", "true");
-      }
+      const open = menuBtn.getAttribute("aria-expanded") === "true";
+      if (open) closeMenu();
+      else openMenu();
     });
+
     mobileNav.querySelectorAll("a").forEach(function (link) {
       link.addEventListener("click", function () {
-        mobileNav.setAttribute("hidden", "");
-        menuBtn.setAttribute("aria-expanded", "false");
+        closeMenu();
       });
     });
   }
