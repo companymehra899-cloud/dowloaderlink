@@ -97,7 +97,7 @@
     if (submitBtn) submitBtn.disabled = true;
     if (progressBar) progressBar.style.width = "100%";
 
-    const finalDownloadUrl = "https://youtubepp.com/watch?v=" + videoId;
+    const finalDownloadUrl = "https://ssyoutube.com/watch?v=" + videoId;
 
     setTimeout(function () {
       if (statusCard) {
