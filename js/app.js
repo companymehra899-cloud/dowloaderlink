@@ -210,42 +210,52 @@
 
     statusCard.hidden = false;
     submitBtn.disabled = true;
-    progressBar.style.width = "50%";
+    progressBar.style.width = "40%";
 
-    fetch("https://cobalt.tools", {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        url: url,
-        videoQuality: "720"
+    const proxyUrl = "https://allorigins.win" + encodeURIComponent("https://api.cobalt.tools/");
+
+    fetch(proxyUrl)
+      .then(function (response) {
+        if (response.ok) return response.json();
+        throw new Error("Network response was not ok.");
       })
-    })
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (data) {
-      statusCard.hidden = true;
-      submitBtn.disabled = false;
+      .then(function (proxyData) {
+        return fetch("https://api.cobalt.tools/", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            url: url,
+            videoQuality: "720"
+          })
+        });
+      })
+      .then(function (cobaltResponse) {
+        return cobaltResponse.json();
+      })
+      .then(function (data) {
+        statusCard.hidden = true;
+        submitBtn.disabled = false;
 
-      if (data.status === "stream" || data.status === "redirect") {
-        renderResult(data.url);
-      } else if (data.status === "picker") {
-        renderResult(data.picker[0].url);
-      } else {
-        formError.textContent = data.text || "वीडियो डाउनलोड करने में असमर्थ। कृपया लिंक जांचें।";
+        if (data && data.url) {
+          renderResult(data.url);
+        } else if (data && data.text) {
+          formError.textContent = data.text;
+          formError.hidden = false;
+        } else {
+          formError.textContent = "वीडियो डाउनलोड लिंक नहीं मिल सका। कृपया दूसरा लिंक आज़माएं।";
+          formError.hidden = false;
+        }
+      })
+      .catch(function (error) {
+        statusCard.hidden = true;
+        submitBtn.disabled = false;
+        formError.textContent = "सर्वर सुरक्षा ब्लॉक या डाउन है। कृपया कुछ देर बाद प्रयास करें।";
         formError.hidden = false;
-      }
-    })
-    .catch(function (error) {
-      statusCard.hidden = true;
-      submitBtn.disabled = false;
-      formError.textContent = "सर्वर से कनेक्ट नहीं हो सका। कृपया बाद में प्रयास करें।";
-      formError.hidden = false;
-      console.error("Error:", error);
-    });
+        console.error("Detailed Error:", error);
+      });
   }
 
   form.addEventListener("submit", function (event) {
