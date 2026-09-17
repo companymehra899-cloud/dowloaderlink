@@ -108,15 +108,9 @@
 
   function formatsFor(kind, url) {
     if (kind === "video") {
-      const mp4 = isDirectMedia(url) ? url : SAMPLE_MP4;
-      const mp4Hd = isDirectMedia(url) ? url : SAMPLE_MP4_HD;
-      const mp4Sd = isDirectMedia(url) ? url : SAMPLE_MP4_SD;
       return [
-        { fmt: "MP4", quality: "1080p", size: "Full HD", href: mp4Hd, mp3: false },
-        { fmt: "MP4", quality: "720p", size: "HD", href: mp4, mp3: false },
-        { fmt: "MP4", quality: "480p", size: "SD+", href: mp4Sd, mp3: false },
-        { fmt: "MP4", quality: "360p", size: "SD", href: mp4Sd, mp3: false },
-        { fmt: "MP3", quality: "128kbps", size: "Audio", href: mp4, mp3: true }
+        { fmt: "MP4", quality: "720p", size: "HD", href: url, mp3: false },
+        { fmt: "MP3", quality: "128kbps", size: "Audio", href: url, mp3: true }
       ];
     }
     if (kind === "audio") {
@@ -138,25 +132,26 @@
       .replace(/"/g, "&quot;");
   }
 
-  const SAMPLE_MP4 = "https://zencdn.net";
-  const SAMPLE_MP4_HD = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
-  const SAMPLE_MP4_SD = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
-
   function isDirectMedia(url) {
     return /\.(mp4|webm|mkv|mov|mp3|wav|m4a|pdf|zip|7z|rar|png|jpe?g|webp)(\?|$)/i.test(url);
   }
 
-  function renderResult(url) {
+  function renderResult(payload) {
+    const url = typeof payload === "string" ? payload : (payload.sourceUrl || payload.url || "");
+    const apiFormats = payload && payload.formats && payload.formats.length ? payload.formats : null;
     const kind = detectKind(url);
-    const host = hostFromUrl(url) || "direct file";
-    const name = filenameFromUrl(url);
+    const host = (payload && payload.host) || hostFromUrl(url) || "direct file";
+    const name = (payload && payload.title) || filenameFromUrl(url);
     const title = kind === "file" ? name : (name && name !== "download" ? name : "Video from " + host);
     const badge = kind === "video" ? "VIDEO" : kind === "audio" ? "AUDIO" : "FILE";
-    const downloadUrl = isDirectMedia(url) ? url : (kind === "video" || kind === "audio" ? SAMPLE_MP4 : url);
-    const thumbInner = isDirectMedia(url) && kind === "video"
-      ? '<video src="' + escapeHtml(url) + '" muted playsinline preload="metadata"></video>'
-      : '<div class="sf-thumb-fallback">' + badge + "</div>";
-    const rows = formatsFor(kind, downloadUrl)
+    const downloadUrl = apiFormats ? url : (isDirectMedia(url) ? url : url);
+    const thumb = payload && payload.thumbnail;
+    const thumbInner = thumb
+      ? '<img src="' + escapeHtml(thumb) + '" alt="">'
+      : (isDirectMedia(url) && kind === "video"
+        ? '<video src="' + escapeHtml(url) + '" muted playsinline preload="metadata"></video>'
+        : '<div class="sf-thumb-fallback">' + badge + "</div>");
+    const rows = (apiFormats || formatsFor(kind, downloadUrl))
       .map(function (item) {
         const cls = item.mp3 ? "btn-dl mp3" : "btn-dl";
         const fileName = kind === "video" && !item.mp3
@@ -199,8 +194,7 @@
   const COBALT_INSTANCES = [
     "https://kwi.at",
     "https://wuk.sh",
-    "https://pop0001.de",
-    "https://cobalt.tools"
+    "https://pop0001.de"
   ];
 
   async function runDownload(rawUrl) {
@@ -226,7 +220,9 @@
       progressBar.style.width = (30 + (i * 20)) + "%";
 
       try {
-        const response = await fetch(currentApi, {
+        const proxyUrl = "https://allorigins.win" + encodeURIComponent(currentApi);
+
+        const response = await fetch(proxyUrl, {
           method: "POST",
           headers: {
             "Accept": "application/json",
@@ -234,18 +230,21 @@
           },
           body: JSON.stringify({
             url: url,
-            videoQuality: "720"
+            videoQuality: "720",
+            filenamePattern: "pretty"
           })
         });
 
         if (!response.ok) continue;
+        const proxyData = await response.json();
 
-        const data = await response.json();
+        const data = JSON.parse(proxyData.contents);
 
-        if (data && data.url) {
+        if (data && (data.url || data.status === "stream")) {
+          const downloadLink = data.url || data.text;
           statusCard.hidden = true;
           submitBtn.disabled = false;
-          renderResult(data.url);
+          renderResult(downloadLink);
           success = true;
           break;
         }
@@ -257,7 +256,7 @@
     if (!success) {
       statusCard.hidden = true;
       submitBtn.disabled = false;
-      formError.textContent = "अभी सभी डाउनलोड सर्वर्स बिजी हैं। कृपया कुछ देर बाद फिर प्रयास करें या कोई दूसरा लिंक डालें।";
+      formError.textContent = "अभी डाउनलोड सर्वर से कनेक्ट होने में समस्या आ रही है। कृपया कुछ देर बाद फिर प्रयास करें।";
       formError.hidden = false;
     }
   }
