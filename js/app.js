@@ -164,8 +164,7 @@
           '<span class="sf-fmt">' + escapeHtml(item.fmt) + "</span>" +
           '<span class="sf-q">' + escapeHtml(item.quality) + "</span>" +
           '<span class="sf-size">' + escapeHtml(item.size) + "</span>" +
-          '<a class="' + cls + '" href="' + escapeHtml(item.href) +
-          '" download="' + escapeHtml(fileName) + '">Download</a>' +
+          '<a class="' + cls + '" href="' + escapeHtml(item.href) + '">Download</a>' +
           "</div>"
         );
       })
@@ -225,7 +224,8 @@
         return;
     }
 
-    const directDownloadUrl = "https://9xbuddy.org" + encodeURIComponent("https://youtube.com" + videoId);
+    const youtubeWatchUrl = "https://www.youtube.com/watch?v=" + videoId;
+    const directDownloadUrl = "https://9xbuddy.org/process?url=" + encodeURIComponent(youtubeWatchUrl);
 
     statusCard.hidden = true;
     submitBtn.disabled = false;
