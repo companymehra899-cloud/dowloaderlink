@@ -100,7 +100,7 @@
       if (submitBtn) submitBtn.disabled = false;
 
       if (data && data.url) {
-        renderResult(data.url, "YouTube Video");
+        renderResult(data.url, data.title || "YouTube Video");
       } else {
         formError.textContent = data.error || "डाउनलोड लिंक नहीं मिल सका। कृपया लिंक जांचें।";
         formError.hidden = false;
