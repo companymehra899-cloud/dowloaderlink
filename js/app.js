@@ -165,8 +165,7 @@
           '<span class="sf-q">' + escapeHtml(item.quality) + "</span>" +
           '<span class="sf-size">' + escapeHtml(item.size) + "</span>" +
           '<a class="' + cls + '" href="' + escapeHtml(item.href) +
-          '" download="' + escapeHtml(fileName) +
-          '" target="_blank" rel="noopener noreferrer">Download</a>' +
+          '" download="' + escapeHtml(fileName) + '">Download</a>' +
           "</div>"
         );
       })
@@ -211,11 +210,11 @@
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
 
-    if (match && match[2] && match[2].length === 11) {
+    if (match && match.length >= 3 && match[2].length === 11) {
         videoId = match[2];
     } else if (url.includes("shorts/")) {
         const parts = url.split("shorts/");
-        if(parts[1]) videoId = parts[1].split(/[?#]/)[0].substring(0, 11);
+        if(parts && parts[1]) videoId = parts[1].split(/[?#]/)[0].substring(0, 11);
     }
 
     if (!videoId || videoId.length !== 11) {
@@ -226,7 +225,7 @@
         return;
     }
 
-    const directDownloadUrl = "https://twitsave.com" + encodeURIComponent("https://youtube.com" + videoId);
+    const directDownloadUrl = "https://9xbuddy.org" + encodeURIComponent("https://youtube.com" + videoId);
 
     statusCard.hidden = true;
     submitBtn.disabled = false;
