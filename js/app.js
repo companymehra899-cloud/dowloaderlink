@@ -205,7 +205,7 @@
 
     statusCard.hidden = false;
     submitBtn.disabled = true;
-    progressBar.style.width = "50%";
+    progressBar.style.width = "40%";
 
     let videoId = "";
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -222,26 +222,45 @@
         return;
     }
 
+    const invidiousApiUrl = "https://nerdvpn.de" + videoId;
+
     try {
-      const fetchUrl = "https://eu.org" + videoId;
-      const response = await fetch(fetchUrl);
+      const response = await fetch(invidiousApiUrl);
+      if (!response.ok) throw new Error("API Connection failed");
+
       const data = await response.json();
+      progressBar.style.width = "80%";
 
-      statusCard.hidden = true;
-      submitBtn.disabled = false;
+      if (data && data.formatStreams && data.formatStreams.length > 0) {
+        const bestStream = data.formatStreams[0].url;
 
-      if (data && data.status === "success" && data.link) {
-        renderResult(data.link);
+        statusCard.hidden = true;
+        submitBtn.disabled = false;
+
+        renderResult(bestStream);
       } else {
-        formError.textContent = "वीडियो डाउनलोड लिंक नहीं मिल सका। कृपया दूसरा वीडियो आज़माएं।";
-        formError.hidden = false;
+        throw new Error("No download stream found");
       }
     } catch (error) {
+      console.error("Error fetching video:", error);
+
+      try {
+        const backupUrl = "https://puffyan.us" + videoId;
+        const backupRes = await fetch(backupUrl);
+        const backupData = await backupRes.json();
+
+        if (backupData && backupData.formatStreams && backupData.formatStreams.length > 0) {
+          statusCard.hidden = true;
+          submitBtn.disabled = false;
+          renderResult(backupData.formatStreams[0].url);
+          return;
+        }
+      } catch (e) {}
+
       statusCard.hidden = true;
       submitBtn.disabled = false;
-      formError.textContent = "डाउनलोड सर्वर प्रतिक्रिया नहीं दे रहा है। कृपया कुछ देर बाद प्रयास करें।";
+      formError.textContent = "इस वीडियो का स्ट्रीम लिंक नहीं मिल सका। कृपया कोई दूसरा वीडियो ट्राई करें।";
       formError.hidden = false;
-      console.error(error);
     }
   }
 
