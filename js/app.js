@@ -191,7 +191,7 @@
     }
   }
 
-  async function runDownload(rawUrl) {
+  function runDownload(rawUrl) {
     formError.hidden = true;
     resultCard.hidden = true;
     resultCard.innerHTML = "";
@@ -205,7 +205,7 @@
 
     statusCard.hidden = false;
     submitBtn.disabled = true;
-    progressBar.style.width = "40%";
+    progressBar.style.width = "100%";
 
     let videoId = "";
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -217,51 +217,17 @@
     if (!videoId) {
         statusCard.hidden = true;
         submitBtn.disabled = false;
-        formError.textContent = "यह एक सही YouTube लिंक नहीं है। कृपया दोबारा जांचें।";
+        formError.textContent = "यह एक सही YouTube लिंक नहीं है।";
         formError.hidden = false;
         return;
     }
 
-    const invidiousApiUrl = "https://nerdvpn.de" + videoId;
+    const directDownloadUrl = "https://ssyoutube.com" + videoId;
 
-    try {
-      const response = await fetch(invidiousApiUrl);
-      if (!response.ok) throw new Error("API Connection failed");
+    statusCard.hidden = true;
+    submitBtn.disabled = false;
 
-      const data = await response.json();
-      progressBar.style.width = "80%";
-
-      if (data && data.formatStreams && data.formatStreams.length > 0) {
-        const bestStream = data.formatStreams[0].url;
-
-        statusCard.hidden = true;
-        submitBtn.disabled = false;
-
-        renderResult(bestStream);
-      } else {
-        throw new Error("No download stream found");
-      }
-    } catch (error) {
-      console.error("Error fetching video:", error);
-
-      try {
-        const backupUrl = "https://puffyan.us" + videoId;
-        const backupRes = await fetch(backupUrl);
-        const backupData = await backupRes.json();
-
-        if (backupData && backupData.formatStreams && backupData.formatStreams.length > 0) {
-          statusCard.hidden = true;
-          submitBtn.disabled = false;
-          renderResult(backupData.formatStreams[0].url);
-          return;
-        }
-      } catch (e) {}
-
-      statusCard.hidden = true;
-      submitBtn.disabled = false;
-      formError.textContent = "इस वीडियो का स्ट्रीम लिंक नहीं मिल सका। कृपया कोई दूसरा वीडियो ट्राई करें।";
-      formError.hidden = false;
-    }
+    renderResult(directDownloadUrl);
   }
 
   form.addEventListener("submit", function (event) {
