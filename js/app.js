@@ -112,7 +112,7 @@
       }
       if (submitBtn) submitBtn.disabled = false;
 
-      formError.textContent = "API सर्वर अभी स्लीप मोड में था। यह अब जाग चुका है, कृपया एक बार और डाउनलोड बटन दबाएं।";
+      formError.textContent = "सर्वर रिस्पॉन्स प्रोसेस करने में असमर्थ। कृपया कुछ देर बाद दोबारा प्रयास करें।";
       formError.hidden = false;
       console.error("API Error:", error);
     }
