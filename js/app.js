@@ -100,7 +100,7 @@
       if (submitBtn) submitBtn.disabled = false;
 
       if (data && data.url) {
-        renderResult(data.url, "Downloaded Video");
+        renderResult(data.url, "YouTube Video");
       } else {
         formError.textContent = data.error || "डाउनलोड लिंक नहीं मिल सका। कृपया लिंक जांचें।";
         formError.hidden = false;
@@ -112,7 +112,7 @@
       }
       if (submitBtn) submitBtn.disabled = false;
 
-      formError.textContent = "API सर्वर सो रहा है (Sleep mode में है)। इसे जागने में 30 सेकंड लगते हैं, कृपया दोबारा बटन दबाएं।";
+      formError.textContent = "API सर्वर अभी स्लीप मोड में था। यह अब जाग चुका है, कृपया एक बार और डाउनलोड बटन दबाएं।";
       formError.hidden = false;
       console.error("API Error:", error);
     }
@@ -123,15 +123,6 @@
     downloadForm.addEventListener("submit", function (e) {
       e.preventDefault();
       if (urlInput) window.runDownload(urlInput.value);
-    });
-  }
-
-  const ctaForm = document.getElementById("ctaForm");
-  if (ctaForm) {
-    ctaForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const ctaInput = ctaForm.querySelector("input");
-      if (ctaInput) window.runDownload(ctaInput.value);
     });
   }
 })();
