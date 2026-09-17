@@ -138,7 +138,7 @@
       .replace(/"/g, "&quot;");
   }
 
-  const SAMPLE_MP4 = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+  const SAMPLE_MP4 = "https://zencdn.net";
   const SAMPLE_MP4_HD = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
   const SAMPLE_MP4_SD = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
 
@@ -203,30 +203,49 @@
 
     const url = (rawUrl || "").trim();
     if (!isHttpUrl(url)) {
-      formError.textContent = "Enter a valid http or https URL.";
+      formError.textContent = "कृपया एक सही HTTP या HTTPS URL दर्ज करें।";
       formError.hidden = false;
       return;
     }
 
     statusCard.hidden = false;
     submitBtn.disabled = true;
-    let width = 8;
-    progressBar.style.width = width + "%";
-    const timer = setInterval(function () {
-      width = Math.min(width + 12 + Math.random() * 10, 92);
-      progressBar.style.width = width + "%";
-    }, 180);
+    progressBar.style.width = "50%";
 
-    setTimeout(function () {
-      clearInterval(timer);
-      progressBar.style.width = "100%";
-      setTimeout(function () {
-        statusCard.hidden = true;
-        progressBar.style.width = "8%";
-        submitBtn.disabled = false;
-        renderResult(url);
-      }, 220);
-    }, 1100);
+    fetch("https://cobalt.tools", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        url: url,
+        videoQuality: "720"
+      })
+    })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      statusCard.hidden = true;
+      submitBtn.disabled = false;
+
+      if (data.status === "stream" || data.status === "redirect") {
+        renderResult(data.url);
+      } else if (data.status === "picker") {
+        renderResult(data.picker[0].url);
+      } else {
+        formError.textContent = data.text || "वीडियो डाउनलोड करने में असमर्थ। कृपया लिंक जांचें।";
+        formError.hidden = false;
+      }
+    })
+    .catch(function (error) {
+      statusCard.hidden = true;
+      submitBtn.disabled = false;
+      formError.textContent = "सर्वर से कनेक्ट नहीं हो सका। कृपया बाद में प्रयास करें।";
+      formError.hidden = false;
+      console.error("Error:", error);
+    });
   }
 
   form.addEventListener("submit", function (event) {
