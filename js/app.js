@@ -210,19 +210,23 @@
     let videoId = "";
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
-    if (match && match[2].length === 11) {
+
+    if (match && match[2] && match[2].length === 11) {
         videoId = match[2];
+    } else if (url.includes("shorts/")) {
+        const shortsParts = url.split("shorts/");
+        if(shortsParts[1]) videoId = shortsParts[1].split(/[?#]/)[0].substring(0, 11);
     }
 
-    if (!videoId) {
+    if (!videoId || videoId.length !== 11) {
         statusCard.hidden = true;
         submitBtn.disabled = false;
-        formError.textContent = "यह एक सही YouTube लिंक नहीं है।";
+        formError.textContent = "यह एक सही YouTube लिंक नहीं है। कृपया दोबारा जांचें।";
         formError.hidden = false;
         return;
     }
 
-    const directDownloadUrl = "https://ssyoutube.com" + videoId;
+    const directDownloadUrl = "https://www.ssyoutube.com/watch?v=" + videoId;
 
     statusCard.hidden = true;
     submitBtn.disabled = false;
