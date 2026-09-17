@@ -191,12 +191,6 @@
     }
   }
 
-  const COBALT_INSTANCES = [
-    "https://kwi.at",
-    "https://wuk.sh",
-    "https://pop0001.de"
-  ];
-
   async function runDownload(rawUrl) {
     formError.hidden = true;
     resultCard.hidden = true;
@@ -211,53 +205,34 @@
 
     statusCard.hidden = false;
     submitBtn.disabled = true;
-    progressBar.style.width = "30%";
+    progressBar.style.width = "50%";
 
-    let success = false;
+    try {
+      const response = await fetch("download.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ url: url })
+      });
 
-    for (let i = 0; i < COBALT_INSTANCES.length; i++) {
-      const currentApi = COBALT_INSTANCES[i];
-      progressBar.style.width = (30 + (i * 20)) + "%";
+      const data = await response.json();
 
-      try {
-        const proxyUrl = "https://allorigins.win" + encodeURIComponent(currentApi);
-
-        const response = await fetch(proxyUrl, {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            url: url,
-            videoQuality: "720",
-            filenamePattern: "pretty"
-          })
-        });
-
-        if (!response.ok) continue;
-        const proxyData = await response.json();
-
-        const data = JSON.parse(proxyData.contents);
-
-        if (data && (data.url || data.status === "stream")) {
-          const downloadLink = data.url || data.text;
-          statusCard.hidden = true;
-          submitBtn.disabled = false;
-          renderResult(downloadLink);
-          success = true;
-          break;
-        }
-      } catch (err) {
-        console.warn("Server " + currentApi + " failed, trying next...");
-      }
-    }
-
-    if (!success) {
       statusCard.hidden = true;
       submitBtn.disabled = false;
-      formError.textContent = "अभी डाउनलोड सर्वर से कनेक्ट होने में समस्या आ रही है। कृपया कुछ देर बाद फिर प्रयास करें।";
+
+      if (data && data.url) {
+        renderResult(data.url);
+      } else {
+        formError.textContent = data.error || "डाउनलोड करने में असमर्थ। कृपया लिंक जांचें।";
+        formError.hidden = false;
+      }
+    } catch (error) {
+      statusCard.hidden = true;
+      submitBtn.disabled = false;
+      formError.textContent = "सर्वर से कनेक्ट नहीं हो सका। कृपया अपनी होस्टिंग चेक करें।";
       formError.hidden = false;
+      console.error(error);
     }
   }
 
