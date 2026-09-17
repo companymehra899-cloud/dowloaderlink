@@ -214,8 +214,8 @@
     if (match && match[2] && match[2].length === 11) {
         videoId = match[2];
     } else if (url.includes("shorts/")) {
-        const shortsParts = url.split("shorts/");
-        if(shortsParts[1]) videoId = shortsParts[1].split(/[?#]/)[0].substring(0, 11);
+        const parts = url.split("shorts/");
+        if(parts[1]) videoId = parts[1].split(/[?#]/)[0].substring(0, 11);
     }
 
     if (!videoId || videoId.length !== 11) {
@@ -226,7 +226,7 @@
         return;
     }
 
-    const directDownloadUrl = "https://www.ssyoutube.com/watch?v=" + videoId;
+    const directDownloadUrl = "https://twitsave.com" + encodeURIComponent("https://youtube.com" + videoId);
 
     statusCard.hidden = true;
     submitBtn.disabled = false;
