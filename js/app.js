@@ -82,7 +82,7 @@
     if (progressBar) progressBar.style.width = "50%";
 
     try {
-      const response = await fetch("https://onrender.com", {
+      const response = await fetch("https://youtube-downloader-api-rvgh.onrender.com/api/download", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
