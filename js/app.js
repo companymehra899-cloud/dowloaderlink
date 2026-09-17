@@ -207,30 +207,39 @@
     submitBtn.disabled = true;
     progressBar.style.width = "50%";
 
-    try {
-      const response = await fetch("download.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ url: url })
-      });
+    let videoId = "";
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+        videoId = match[2];
+    }
 
+    if (!videoId) {
+        statusCard.hidden = true;
+        submitBtn.disabled = false;
+        formError.textContent = "यह एक सही YouTube लिंक नहीं है। कृपया दोबारा जांचें।";
+        formError.hidden = false;
+        return;
+    }
+
+    try {
+      const fetchUrl = "https://eu.org" + videoId;
+      const response = await fetch(fetchUrl);
       const data = await response.json();
 
       statusCard.hidden = true;
       submitBtn.disabled = false;
 
-      if (data && data.url) {
-        renderResult(data.url);
+      if (data && data.status === "success" && data.link) {
+        renderResult(data.link);
       } else {
-        formError.textContent = data.error || "डाउनलोड करने में असमर्थ। कृपया लिंक जांचें।";
+        formError.textContent = "वीडियो डाउनलोड लिंक नहीं मिल सका। कृपया दूसरा वीडियो आज़माएं।";
         formError.hidden = false;
       }
     } catch (error) {
       statusCard.hidden = true;
       submitBtn.disabled = false;
-      formError.textContent = "सर्वर से कनेक्ट नहीं हो सका। कृपया अपनी होस्टिंग चेक करें।";
+      formError.textContent = "डाउनलोड सर्वर प्रतिक्रिया नहीं दे रहा है। कृपया कुछ देर बाद प्रयास करें।";
       formError.hidden = false;
       console.error(error);
     }
