@@ -196,7 +196,14 @@
     }
   }
 
-  function runDownload(rawUrl) {
+  const COBALT_INSTANCES = [
+    "https://kwi.at",
+    "https://wuk.sh",
+    "https://pop0001.de",
+    "https://cobalt.tools"
+  ];
+
+  async function runDownload(rawUrl) {
     formError.hidden = true;
     resultCard.hidden = true;
     resultCard.innerHTML = "";
@@ -210,17 +217,16 @@
 
     statusCard.hidden = false;
     submitBtn.disabled = true;
-    progressBar.style.width = "40%";
+    progressBar.style.width = "30%";
 
-    const proxyUrl = "https://allorigins.win" + encodeURIComponent("https://api.cobalt.tools/");
+    let success = false;
 
-    fetch(proxyUrl)
-      .then(function (response) {
-        if (response.ok) return response.json();
-        throw new Error("Network response was not ok.");
-      })
-      .then(function (proxyData) {
-        return fetch("https://api.cobalt.tools/", {
+    for (let i = 0; i < COBALT_INSTANCES.length; i++) {
+      const currentApi = COBALT_INSTANCES[i];
+      progressBar.style.width = (30 + (i * 20)) + "%";
+
+      try {
+        const response = await fetch(currentApi, {
           method: "POST",
           headers: {
             "Accept": "application/json",
@@ -231,31 +237,29 @@
             videoQuality: "720"
           })
         });
-      })
-      .then(function (cobaltResponse) {
-        return cobaltResponse.json();
-      })
-      .then(function (data) {
-        statusCard.hidden = true;
-        submitBtn.disabled = false;
+
+        if (!response.ok) continue;
+
+        const data = await response.json();
 
         if (data && data.url) {
+          statusCard.hidden = true;
+          submitBtn.disabled = false;
           renderResult(data.url);
-        } else if (data && data.text) {
-          formError.textContent = data.text;
-          formError.hidden = false;
-        } else {
-          formError.textContent = "वीडियो डाउनलोड लिंक नहीं मिल सका। कृपया दूसरा लिंक आज़माएं।";
-          formError.hidden = false;
+          success = true;
+          break;
         }
-      })
-      .catch(function (error) {
-        statusCard.hidden = true;
-        submitBtn.disabled = false;
-        formError.textContent = "सर्वर सुरक्षा ब्लॉक या डाउन है। कृपया कुछ देर बाद प्रयास करें।";
-        formError.hidden = false;
-        console.error("Detailed Error:", error);
-      });
+      } catch (err) {
+        console.warn("Server " + currentApi + " failed, trying next...");
+      }
+    }
+
+    if (!success) {
+      statusCard.hidden = true;
+      submitBtn.disabled = false;
+      formError.textContent = "अभी सभी डाउनलोड सर्वर्स बिजी हैं। कृपया कुछ देर बाद फिर प्रयास करें या कोई दूसरा लिंक डालें।";
+      formError.hidden = false;
+    }
   }
 
   form.addEventListener("submit", function (event) {
