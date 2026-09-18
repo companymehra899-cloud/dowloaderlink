@@ -41,8 +41,71 @@
     });
   });
 
+  var RESULT_CACHE = {};
+  var CACHE_KEY = "fetchora_dl_cache_v1";
+
+  try {
+    RESULT_CACHE = JSON.parse(sessionStorage.getItem(CACHE_KEY) || "{}") || {};
+  } catch (e) {
+    RESULT_CACHE = {};
+  }
+
   function isDirectFile(url) {
     return /\.(mp4|webm|mkv|mov|avi|mp3|wav|m4a|ogg|pdf|zip|7z|gz|tar|rar|iso|apk)(\?|#|$)/i.test(url);
+  }
+
+  function getYouTubeId(url) {
+    var match = String(url).match(
+      /(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+    );
+    if (match && match[1]) return match[1];
+    if (String(url).indexOf("shorts/") !== -1) {
+      var parts = String(url).split("shorts/");
+      if (parts[1]) return parts[1].split(/[?#]/)[0].substring(0, 11);
+    }
+    return null;
+  }
+
+  function cacheKeyFor(url) {
+    var id = getYouTubeId(url);
+    if (id) return "yt:" + id;
+    return "url:" + String(url).split("#")[0].replace(/\/+$/, "");
+  }
+
+  function tunnelExpiry(downloadUrl) {
+    try {
+      var exp = new URL(downloadUrl).searchParams.get("exp");
+      if (!exp) return 0;
+      var n = Number(exp);
+      if (!n) return 0;
+      return n < 1e12 ? n * 1000 : n;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function saveCache() {
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify(RESULT_CACHE));
+    } catch (e) {}
+  }
+
+  function cacheSuccess(url, data) {
+    var key = cacheKeyFor(url);
+    var downloadUrl = data && data.url ? data.url : "";
+    RESULT_CACHE[key] = {
+      data: data,
+      exp: tunnelExpiry(downloadUrl) || Date.now() + 80000
+    };
+    saveCache();
+  }
+
+  function cachedResult(url) {
+    var key = cacheKeyFor(url);
+    var hit = RESULT_CACHE[key];
+    if (!hit || !hit.data) return null;
+    if (hit.exp && Date.now() > hit.exp - 5000) return null;
+    return hit.data;
   }
 
   function escapeHtml(text) {
@@ -135,7 +198,7 @@
     var code = data && data.error && data.error.code;
     if (!code) return "Download link nahi mil saka. Link check karein.";
     if (code.indexOf("youtube.login") !== -1) {
-      return "YouTube ne is video ko block kiya (login/cookies chahiye). Doosra public video try karein, ya Render pe YouTube cookies add karein.";
+      return "YouTube ne Render IP ko temporary block kiya. 5-10 minute wait karke same video dubara try karein.";
     }
     if (code.indexOf("youtube.decipher") !== -1 || code.indexOf("youtube.content") !== -1) {
       return "YouTube ne Render IP ko challenge kiya. Thodi der baad try karein.";
@@ -183,6 +246,11 @@
       return;
     }
 
+    var cached = cachedResult(videoUrl);
+    if (cached && handleCobaltData(cached)) {
+      return;
+    }
+
     setBusy(true, "Preparing your download. First request can take ~30s if the API was sleeping.");
 
     var controller = new AbortController();
@@ -192,8 +260,7 @@
 
     var attempts = [
       { url: videoUrl, videoQuality: "720", downloadMode: "auto", alwaysProxy: true, filenameStyle: "pretty" },
-      { url: videoUrl, videoQuality: "360", downloadMode: "auto", alwaysProxy: true, filenameStyle: "pretty" },
-      { url: videoUrl, downloadMode: "audio", alwaysProxy: true, filenameStyle: "pretty" }
+      { url: videoUrl, videoQuality: "360", downloadMode: "auto", alwaysProxy: true, filenameStyle: "pretty" }
     ];
 
     try {
@@ -201,13 +268,16 @@
       for (var i = 0; i < attempts.length; i++) {
         var data = await postCobalt(endpoint, attempts[i], controller.signal);
         if (handleCobaltData(data)) {
+          cacheSuccess(videoUrl, data);
           setBusy(false);
           return;
         }
         lastError = data;
-        if (!(data && data.status === "error" && data.error && String(data.error.code).indexOf("youtube") !== -1)) {
+        var errCode = data && data.error && data.error.code ? String(data.error.code) : "";
+        if (errCode.indexOf("youtube.login") !== -1 || errCode.indexOf("ratelimit") !== -1) {
           break;
         }
+        if (errCode.indexOf("youtube") === -1) break;
       }
       setBusy(false);
       if (lastError && lastError.status === "error") {
