@@ -134,15 +134,46 @@
   function cobaltErrorMessage(data) {
     var code = data && data.error && data.error.code;
     if (!code) return "Download link nahi mil saka. Link check karein.";
+    if (code.indexOf("youtube.login") !== -1) {
+      return "YouTube ne is video ko block kiya (login/cookies chahiye). Doosra public video try karein, ya Render pe YouTube cookies add karein.";
+    }
+    if (code.indexOf("youtube.decipher") !== -1 || code.indexOf("youtube.content") !== -1) {
+      return "YouTube ne Render IP ko challenge kiya. Thodi der baad try karein.";
+    }
     if (code.indexOf("link.invalid") !== -1 || code.indexOf("link.unsupported") !== -1) {
-      return "Ye URL supported nahi hai.";
+      return "Ye URL supported nahi hai. Full YouTube watch/shorts link paste karein.";
     }
     if (code.indexOf("fetch.short_link") !== -1) return "Short link resolve nahi ho saki.";
-    if (code.indexOf("youtube") !== -1) return "YouTube se file nahi nikal saki. Thodi der baad try karein.";
+    if (code.indexOf("youtube") !== -1) return "YouTube se file nahi nikal saki: " + code;
     if (code.indexOf("error.api.rate") !== -1 || code.indexOf("ratelimit") !== -1) {
       return "Bahut requests ho gayi. Thodi der baad try karein.";
     }
     return "Download fail hua: " + code;
+  }
+
+  function handleCobaltData(data) {
+    if (data.status === "tunnel" || data.status === "redirect") {
+      renderResult(data.url, data.filename || "Video Ready", "video");
+      return true;
+    }
+    if (data.status === "picker" && data.picker && data.picker.length) {
+      renderPicker(data.picker, data.audio || "");
+      return true;
+    }
+    return false;
+  }
+
+  async function postCobalt(endpoint, body, signal) {
+    var res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body),
+      signal: signal
+    });
+    return res.json();
   }
 
   async function requestCobalt(videoUrl) {
@@ -159,41 +190,30 @@
       controller.abort();
     }, 90000);
 
+    var attempts = [
+      { url: videoUrl, videoQuality: "720", downloadMode: "auto", alwaysProxy: true, filenameStyle: "pretty" },
+      { url: videoUrl, videoQuality: "360", downloadMode: "auto", alwaysProxy: true, filenameStyle: "pretty" },
+      { url: videoUrl, downloadMode: "audio", alwaysProxy: true, filenameStyle: "pretty" }
+    ];
+
     try {
-      var res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          url: videoUrl,
-          videoQuality: "720",
-          downloadMode: "auto",
-          alwaysProxy: true,
-          filenameStyle: "pretty"
-        }),
-        signal: controller.signal
-      });
-
-      var data = await res.json();
+      var lastError = null;
+      for (var i = 0; i < attempts.length; i++) {
+        var data = await postCobalt(endpoint, attempts[i], controller.signal);
+        if (handleCobaltData(data)) {
+          setBusy(false);
+          return;
+        }
+        lastError = data;
+        if (!(data && data.status === "error" && data.error && String(data.error.code).indexOf("youtube") !== -1)) {
+          break;
+        }
+      }
       setBusy(false);
-
-      if (data.status === "tunnel" || data.status === "redirect") {
-        renderResult(data.url, data.filename || "Video Ready", "video");
+      if (lastError && lastError.status === "error") {
+        showError(cobaltErrorMessage(lastError));
         return;
       }
-
-      if (data.status === "picker" && data.picker && data.picker.length) {
-        renderPicker(data.picker, data.audio || "");
-        return;
-      }
-
-      if (data.status === "error") {
-        showError(cobaltErrorMessage(data));
-        return;
-      }
-
       showError("API se download link nahi mil saka.");
     } catch (err) {
       setBusy(false);
