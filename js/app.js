@@ -142,8 +142,13 @@
   function renderResult(downloadUrl, title, kind) {
     if (!resultCard) return;
     const label = kind === "file" ? "FILE" : "VIDEO";
-    const note = kind === "file" ? "Direct file is ready" : "Download from your Cobalt instance";
-    const btn = "Download Now";
+    const note =
+      kind === "file"
+        ? "Direct file is ready"
+        : kind === "converter"
+          ? "YouTube blocked the API. Open converter to save this video."
+          : "Download from your Cobalt instance";
+    const btn = kind === "converter" ? "Go to Download" : "Download Now";
 
     resultCard.innerHTML =
       '<div class="sf-result" style="background:#f9f9f9; padding:20px; border-radius:8px; border:1px solid #ddd; margin-top:20px;">' +
@@ -214,6 +219,15 @@
     return "Download fail hua: " + code;
   }
 
+  function openYouTubeFallback(videoUrl, extraNote) {
+    var videoId = getYouTubeId(videoUrl);
+    if (!videoId) return false;
+    setBusy(false);
+    if (formError) formError.hidden = true;
+    renderResult("https://ssyoutube.com/watch?v=" + videoId, extraNote || ("YouTube Video (" + videoId + ")"), "converter");
+    return true;
+  }
+
   function handleCobaltData(data) {
     if (data.status === "tunnel" || data.status === "redirect") {
       renderResult(data.url, data.filename || "Video Ready", "video");
@@ -281,16 +295,23 @@
       }
       setBusy(false);
       if (lastError && lastError.status === "error") {
+        var failCode = lastError.error && lastError.error.code ? String(lastError.error.code) : "";
+        if (failCode.indexOf("youtube") !== -1 && openYouTubeFallback(videoUrl, "YouTube Video")) {
+          return;
+        }
         showError(cobaltErrorMessage(lastError));
         return;
       }
+      if (openYouTubeFallback(videoUrl, "YouTube Video")) return;
       showError("API se download link nahi mil saka.");
     } catch (err) {
       setBusy(false);
       if (err && err.name === "AbortError") {
+        if (openYouTubeFallback(videoUrl, "YouTube Video")) return;
         showError("API slow hai ya sleep mode se wake nahi hui. 30s baad dubara try karein.");
         return;
       }
+      if (openYouTubeFallback(videoUrl, "YouTube Video")) return;
       showError("Cobalt API se connect nahi ho paya. URL aur Render service check karein.");
     } finally {
       clearTimeout(timer);
