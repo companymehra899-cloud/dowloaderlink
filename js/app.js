@@ -7,6 +7,8 @@
   const resultCard = document.getElementById("resultCard");
   const formError = document.getElementById("formError");
   const progressBar = document.getElementById("progressBar");
+  const statusText = statusCard ? statusCard.querySelector("p") : null;
+  const COBALT_API = ((window.FETCHORA_CONFIG && window.FETCHORA_CONFIG.cobaltApi) || "").trim();
 
   if (menuBtn && mobileNav) {
     function closeMenu() {
@@ -36,19 +38,6 @@
     });
   });
 
-  function getYouTubeId(url) {
-    const match = url.match(
-      /(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
-    );
-    if (match && match[1]) return match[1];
-
-    if (url.indexOf("shorts/") !== -1) {
-      const parts = url.split("shorts/");
-      if (parts[1]) return parts[1].split(/[?#]/)[0].substring(0, 11);
-    }
-    return null;
-  }
-
   function isDirectFile(url) {
     return /\.(mp4|webm|mkv|mov|avi|mp3|wav|m4a|ogg|pdf|zip|7z|gz|tar|rar|iso|apk)(\?|#|$)/i.test(url);
   }
@@ -61,11 +50,34 @@
       .replace(/"/g, "&quot;");
   }
 
+  function cobaltEndpoint() {
+    if (!COBALT_API) return "";
+    return COBALT_API.replace(/\/?$/, "/");
+  }
+
+  function setBusy(busy, message) {
+    if (statusCard) {
+      statusCard.hidden = !busy;
+      statusCard.style.display = busy ? "block" : "none";
+    }
+    if (statusText && message) statusText.textContent = message;
+    if (submitBtn) submitBtn.disabled = busy;
+    if (progressBar) progressBar.style.width = busy ? "60%" : "100%";
+  }
+
+  function showError(message) {
+    setBusy(false);
+    if (formError) {
+      formError.textContent = message;
+      formError.hidden = false;
+    }
+  }
+
   function renderResult(downloadUrl, title, kind) {
     if (!resultCard) return;
     const label = kind === "file" ? "FILE" : "VIDEO";
-    const note = kind === "file" ? "Direct file is ready" : "Open the converter to save this video";
-    const btn = kind === "file" ? "Download Now" : "Go to Download";
+    const note = kind === "file" ? "Direct file is ready" : "Download from your Cobalt instance";
+    const btn = "Download Now";
 
     resultCard.innerHTML =
       '<div class="sf-result" style="background:#f9f9f9; padding:20px; border-radius:8px; border:1px solid #ddd; margin-top:20px;">' +
@@ -78,21 +90,118 @@
       '<div class="sf-row" style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px;">' +
       '<span class="sf-fmt" style="font-weight:bold; color:#333;">' + label + "</span>" +
       '<span class="sf-q" style="color:#444;">Best Quality</span>' +
-      '<a class="btn-dl" href="' + escapeHtml(downloadUrl) + '" target="_blank" rel="noopener noreferrer" style="background:#28a745; color:#fff; padding:8px 18px; border-radius:4px; text-decoration:none; font-weight:bold; font-size:14px;">' + btn + "</a>" +
+      '<a class="btn-dl" href="' + escapeHtml(downloadUrl) + '" target="_blank" rel="noopener noreferrer" download style="background:#28a745; color:#fff; padding:8px 18px; border-radius:4px; text-decoration:none; font-weight:bold; font-size:14px;">' + btn + "</a>" +
       "</div></div></div>";
 
     resultCard.hidden = false;
     resultCard.style.display = "block";
   }
 
-  function finishReady(downloadUrl, title, kind) {
-    if (statusCard) {
-      statusCard.hidden = true;
-      statusCard.style.display = "none";
+  function renderPicker(items, audioUrl) {
+    if (!resultCard) return;
+    var rows = items.slice(0, 8).map(function (item, index) {
+      var label = (item.type || "media").toUpperCase();
+      var href = item.url || "";
+      return (
+        '<div class="sf-row" style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px; border-top:1px solid #eee;">' +
+        '<span class="sf-fmt" style="font-weight:bold; color:#333;">' + escapeHtml(label) + " " + (index + 1) + "</span>" +
+        '<a class="btn-dl" href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer" download style="background:#28a745; color:#fff; padding:8px 18px; border-radius:4px; text-decoration:none; font-weight:bold; font-size:14px;">Download</a>' +
+        "</div>"
+      );
+    }).join("");
+
+    if (audioUrl) {
+      rows +=
+        '<div class="sf-row" style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px; border-top:1px solid #eee;">' +
+        '<span class="sf-fmt" style="font-weight:bold; color:#333;">AUDIO</span>' +
+        '<a class="btn-dl" href="' + escapeHtml(audioUrl) + '" target="_blank" rel="noopener noreferrer" download style="background:#28a745; color:#fff; padding:8px 18px; border-radius:4px; text-decoration:none; font-weight:bold; font-size:14px;">Download</a>' +
+        "</div>";
     }
-    if (submitBtn) submitBtn.disabled = false;
-    if (progressBar) progressBar.style.width = "100%";
-    renderResult(downloadUrl, title, kind);
+
+    resultCard.innerHTML =
+      '<div class="sf-result" style="background:#f9f9f9; padding:20px; border-radius:8px; border:1px solid #ddd; margin-top:20px;">' +
+      '<div class="sf-info"><h3 style="margin:0 0 5px 0; font-size:16px; color:#333;">Choose a file</h3>' +
+      '<p style="margin:0; font-size:13px; color:#666;">This link has multiple items</p></div>' +
+      '<div class="sf-table" style="margin-top:20px; background:#fff; border-radius:6px; border:1px solid #eee;">' + rows + "</div></div>";
+
+    resultCard.hidden = false;
+    resultCard.style.display = "block";
+  }
+
+  function cobaltErrorMessage(data) {
+    var code = data && data.error && data.error.code;
+    if (!code) return "Download link nahi mil saka. Link check karein.";
+    if (code.indexOf("link.invalid") !== -1 || code.indexOf("link.unsupported") !== -1) {
+      return "Ye URL supported nahi hai.";
+    }
+    if (code.indexOf("fetch.short_link") !== -1) return "Short link resolve nahi ho saki.";
+    if (code.indexOf("youtube") !== -1) return "YouTube se file nahi nikal saki. Thodi der baad try karein.";
+    if (code.indexOf("error.api.rate") !== -1 || code.indexOf("ratelimit") !== -1) {
+      return "Bahut requests ho gayi. Thodi der baad try karein.";
+    }
+    return "Download fail hua: " + code;
+  }
+
+  async function requestCobalt(videoUrl) {
+    var endpoint = cobaltEndpoint();
+    if (!endpoint) {
+      showError("Cobalt API URL set nahi hai. js/config.js mein cobaltApi apna Render URL daalein.");
+      return;
+    }
+
+    setBusy(true, "Preparing your download. First request can take ~30s if the API was sleeping.");
+
+    var controller = new AbortController();
+    var timer = setTimeout(function () {
+      controller.abort();
+    }, 90000);
+
+    try {
+      var res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          url: videoUrl,
+          videoQuality: "720",
+          downloadMode: "auto",
+          alwaysProxy: true,
+          filenameStyle: "pretty"
+        }),
+        signal: controller.signal
+      });
+
+      var data = await res.json();
+      setBusy(false);
+
+      if (data.status === "tunnel" || data.status === "redirect") {
+        renderResult(data.url, data.filename || "Video Ready", "video");
+        return;
+      }
+
+      if (data.status === "picker" && data.picker && data.picker.length) {
+        renderPicker(data.picker, data.audio || "");
+        return;
+      }
+
+      if (data.status === "error") {
+        showError(cobaltErrorMessage(data));
+        return;
+      }
+
+      showError("API se download link nahi mil saka.");
+    } catch (err) {
+      setBusy(false);
+      if (err && err.name === "AbortError") {
+        showError("API slow hai ya sleep mode se wake nahi hui. 30s baad dubara try karein.");
+        return;
+      }
+      showError("Cobalt API se connect nahi ho paya. URL aur Render service check karein.");
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   window.runDownload = function (rawUrl) {
@@ -104,39 +213,21 @@
 
     const url = (rawUrl || "").trim();
     if (!url) {
-      if (formError) {
-        formError.textContent = "Paste a YouTube or direct file URL.";
-        formError.hidden = false;
-      }
+      showError("Paste a video or direct file URL.");
       return;
     }
 
-    const videoId = getYouTubeId(url);
-    const direct = isDirectFile(url);
-
-    if (!videoId && !direct) {
-      if (formError) {
-        formError.textContent = "Use a YouTube / Shorts link or a direct file URL (mp4, pdf, zip).";
-        formError.hidden = false;
-      }
+    if (isDirectFile(url)) {
+      setBusy(true, "Preparing your download link. Stay on this page.");
+      setTimeout(function () {
+        setBusy(false);
+        const name = url.split("?")[0].split("/").pop() || "File";
+        renderResult(url, name, "file");
+      }, 300);
       return;
     }
 
-    if (statusCard) {
-      statusCard.hidden = false;
-      statusCard.style.display = "block";
-    }
-    if (submitBtn) submitBtn.disabled = true;
-    if (progressBar) progressBar.style.width = "60%";
-
-    setTimeout(function () {
-      if (videoId) {
-        finishReady("https://ssyoutube.com/watch?v=" + videoId, "YouTube Video (" + videoId + ")", "video");
-        return;
-      }
-      const name = url.split("?")[0].split("/").pop() || "File";
-      finishReady(url, name, "file");
-    }, 500);
+    requestCobalt(url);
   };
 
   const downloadForm = document.getElementById("downloadForm");

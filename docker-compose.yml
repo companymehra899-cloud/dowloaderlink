@@ -1,0 +1,16 @@
+services:
+  cobalt-api:
+    image: ghcr.io/imputnet/cobalt:11
+    init: true
+    read_only: true
+    restart: unless-stopped
+    container_name: cobalt-api
+    ports:
+      - 9000:9000/tcp
+    environment:
+      API_URL: "${API_URL:-http://localhost:9000/}"
+      API_PORT: "9000"
+      CORS_WILDCARD: "1"
+      API_LISTEN_ADDRESS: "0.0.0.0"
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
