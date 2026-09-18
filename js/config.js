@@ -1,3 +1,3 @@
 window.FETCHORA_CONFIG = {
-  cobaltApi: ""
+  cobaltApi: "https://cobalt-11-h57i.onrender.com/"
 };
