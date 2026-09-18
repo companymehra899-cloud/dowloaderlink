@@ -7,10 +7,14 @@ services:
     healthCheckPath: /
     envVars:
       - key: API_URL
-        sync: false
+        value: https://cobalt-11-h57i.onrender.com/
       - key: API_PORT
         value: "10000"
       - key: CORS_WILDCARD
         value: "1"
       - key: API_LISTEN_ADDRESS
         value: "0.0.0.0"
+      - key: COOKIE_PATH
+        value: /tmp/cookies.json
+      - key: COOKIE_JSON
+        sync: false
