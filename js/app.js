@@ -8,7 +8,10 @@
   const formError = document.getElementById("formError");
   const progressBar = document.getElementById("progressBar");
   const statusText = statusCard ? statusCard.querySelector("p") : null;
-  const COBALT_API = ((window.FETCHORA_CONFIG && window.FETCHORA_CONFIG.cobaltApi) || "").trim();
+  const COBALT_API = (
+    (window.FETCHORA_CONFIG && window.FETCHORA_CONFIG.cobaltApi) ||
+    "https://cobalt-11-h57i.onrender.com/"
+  ).trim();
 
   if (menuBtn && mobileNav) {
     function closeMenu() {
